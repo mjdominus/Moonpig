@@ -110,4 +110,37 @@ subtest mutators => sub {
   }
 };
 
+subtest "arithmetic" => sub {
+  my $dt = jan(1);
+  my $dummy = bless {} => 'BLARF';
+
+  like(exception { $dt + {} },
+       qr/Can't add .* to unblessed HASH reference/,
+       "adding a nondate");
+
+  like(exception { $dt + $dummy },
+       qr/Can't add .* to object with no 'as_seconds' method/,
+       "adding a bad object");
+
+  like(exception { $dt + $dt },
+       qr/Can't add .* to object with no 'as_seconds' method/,
+       "adding another DTM");
+
+  like(exception { $dt - {} },
+       qr/Can't subtract unblessed HASH reference/,
+       "subtracting a nondate");
+
+  like(exception { $dt - $dummy },
+       qr/Can't subtract X from .* when X has no 'epoch' method/,
+       "subtracting a bad object");
+
+
+  like(exception { 17 - $dt },
+       qr/subtracting a date from a number/,
+       "subtraction wrong order");
+
+  is(exception { $dt - 17 }, undef, "subtraction right order");
+};
+
+
 done_testing;
